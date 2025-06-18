@@ -1,10 +1,10 @@
 # Life Bot
 
-![Build](https://github.com/ehremut/life/actions/workflows/ci.yml/badge.svg)
-![Coverage](https://codecov.io/gh/ehremut/life/branch/main/graph/badge.svg)
-![License](https://img.shields.io/github/license/ehremut/life)
-![Last Commit](https://img.shields.io/github/last-commit/ehremut/life)
-![Stars](https://img.shields.io/github/stars/ehremut/life?style=social)
+![Build](https://github.com/ehremut/public_life/actions/workflows/ci.yml/badge.svg)
+![Coverage](https://codecov.io/gh/ehremut/public_life/branch/main/graph/badge.svg)
+![License](https://img.shields.io/github/license/ehremut/public_life)
+![Last Commit](https://img.shields.io/github/last-commit/ehremut/public_life)
+![Stars](https://img.shields.io/github/stars/ehremut/public_life?style=social)
 
 A Telegram bot that integrates with a 3x-ui panel to manage access configurations. The
 API client caches the authorization token so you don't have to log in on every
