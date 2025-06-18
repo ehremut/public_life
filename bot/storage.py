@@ -3,7 +3,28 @@ import json
 from pathlib import Path
 from typing import List, Optional
 
-import aiosqlite
+import asyncio
+import sqlite3
+
+
+class AsyncConnection:
+    def __init__(self, conn: sqlite3.Connection):
+        self._conn = conn
+
+    async def execute(self, sql: str, params: tuple = ()):
+        return await asyncio.to_thread(self._conn.execute, sql, params)
+
+    async def commit(self) -> None:
+        await asyncio.to_thread(self._conn.commit)
+
+    async def close(self) -> None:
+        await asyncio.to_thread(self._conn.close)
+
+    def __getattr__(self, name):
+        return getattr(self._conn, name)
+
+import asyncio
+import sqlite3
 
 from .models.user import User
 
@@ -14,11 +35,12 @@ class UserStorage:
     def __init__(self, db_path: str = "users.db", json_path: str = "users.json") -> None:
         self.db_path = db_path
         self.json_path = json_path
-        self.conn: Optional[aiosqlite.Connection] = None
+        self.conn: Optional[AsyncConnection] = None
 
-    async def _connect(self) -> aiosqlite.Connection:
+    async def _connect(self) -> sqlite3.Connection:
         if self.conn is None:
-            self.conn = await aiosqlite.connect(self.db_path)
+            raw = sqlite3.connect(self.db_path, check_same_thread=False)
+            self.conn = AsyncConnection(raw)
             await self.conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS users (
@@ -32,7 +54,7 @@ class UserStorage:
                     xui_id TEXT,
                     config_counter INTEGER
                 )
-                """
+                """,
             )
             await self.conn.commit()
             await self._maybe_migrate()
@@ -40,8 +62,8 @@ class UserStorage:
 
     async def _maybe_migrate(self) -> None:
         conn = await self._connect()
-        async with conn.execute("SELECT COUNT(*) FROM users") as cur:
-            row = await cur.fetchone()
+        cur = await conn.execute("SELECT COUNT(*) FROM users")
+        row = cur.fetchone()
         if row[0] == 0 and Path(self.json_path).exists():
             with open(self.json_path, "r", encoding="utf-8") as fh:
                 try:
@@ -54,14 +76,14 @@ class UserStorage:
 
     async def list_all(self) -> List[User]:
         conn = await self._connect()
-        async with conn.execute("SELECT * FROM users") as cur:
-            rows = await cur.fetchall()
+        cur = await conn.execute("SELECT * FROM users")
+        rows = cur.fetchall()
         return [User(*row) for row in rows]
 
     async def get(self, user_id: int) -> Optional[User]:
         conn = await self._connect()
-        async with conn.execute("SELECT * FROM users WHERE user_id=?", (user_id,)) as cur:
-            row = await cur.fetchone()
+        cur = await conn.execute("SELECT * FROM users WHERE user_id=?", (user_id,))
+        row = cur.fetchone()
         return User(*row) if row else None
 
     async def add(
