@@ -1,0 +1,10 @@
+[bot]
+telegram_token = YOUR_TELEGRAM_TOKEN
+xui_api_url = https://example.com/api/
+xui_login = your_login
+xui_psw = your_password
+xui_inbound_id = 2
+vpn_backend_type = api
+vpn_config_path = config.json
+admin_ids =
+qr_logo_path = logo.png
