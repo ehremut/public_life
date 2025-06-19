@@ -107,3 +107,20 @@ Full deployment steps:
 3. Start the container using `docker compose up -d` or the `docker run` command
    shown above. The database will be created in `users.db` next to the
    repository.
+
+
+## Testing
+
+Unit tests can run without network access thanks to lightweight stubs for `aiohttp`, `aiosqlite` and `python-telegram-bot`. Install the dependencies and run:
+
+```bash
+PYTHONPATH=. pytest -q
+```
+
+To generate a coverage report:
+
+```bash
+PYTHONPATH=. coverage run -m pytest -q
+coverage xml
+```
+
