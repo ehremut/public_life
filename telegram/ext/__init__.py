@@ -10,15 +10,17 @@ class _Filter:
         return self
 
 class Filters(_Filter):
+    def __init__(self):
+        self.TEXT = self
+        self.COMMAND = self
+
     @staticmethod
     def Regex(pattern):
         return Filters()
+
     @staticmethod
     def User(ids):
         return Filters()
-
-TEXT = Filters()
-COMMAND = Filters()
 
 class CommandHandler:
     def __init__(self, command, callback):
